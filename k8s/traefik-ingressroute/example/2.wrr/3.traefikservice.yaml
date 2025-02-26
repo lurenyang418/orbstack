@@ -1,0 +1,13 @@
+apiVersion: traefik.io/v1alpha1
+kind: TraefikService
+metadata:
+  name: wrr
+spec:
+  weighted:
+    services:
+      - name: app1
+        port: 80
+        weight: 1
+      - name: app2
+        port: 80
+        weight: 2
