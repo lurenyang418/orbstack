@@ -1,0 +1,112 @@
+deployment:
+  enabled: true
+  kind: DaemonSet
+
+updateStrategy:  
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1 
+    maxSurge: 0 
+
+ingressClass:  
+  enabled: true
+  isDefaultClass: true
+  name: "traefik"
+
+gateway:
+  enabled: false
+
+gatewayClass:
+  enabled: false
+
+ingressRoute:
+  dashboard:
+    enabled: false
+
+providers:
+  kubernetesCRD: # middleware 需要 crd
+    enabled: true
+
+  kubernetesIngress:
+    enabled: true
+
+  kubernetesGateway:
+    enabled: false
+
+  file:
+    enabled: false
+
+logs:
+  general:
+    format:  # @schema enum:["common", "json", null]; type:[string, null]; default: "common"
+    level: "DEBUG"  # @schema enum:[TRACE,DEBUG,INFO,WARN,ERROR,FATAL,PANIC]; default: "INFO"
+    filePath: ""
+    noColor: false
+  access:
+    enabled: true
+
+metrics:
+  addInternals: true
+
+tracing:
+  addInternals: false
+
+additionalArguments:
+- "--api.insecure=true"
+
+globalArguments:
+- "--global.checknewversion"
+- "--global.sendanonymoususage"
+
+env: []
+
+envFrom: []
+
+ports:
+  traefik:
+    port: 8080
+    hostPort:  8080
+    expose:
+      default: true
+    exposedPort: 8080
+    protocol: TCP
+  web:
+    port: 80
+    hostPort: 80
+    containerPort: 80
+    exposedPort: 80
+    protocol: TCP
+    # redirections:
+    #   entryPoint:
+    #     to: websecure
+    #     scheme: https
+    #     permanent: true
+  websecure:
+    port: 443
+    hostPort:  443
+    containerPort: 443
+    exposedPort: 443
+    protocol: TCP
+    tls:
+      enabled: true
+  metrics:
+    port: 9100
+    exposedPort: 9100
+    protocol: TCP
+
+hostNetwork: true
+
+
+service:
+  enabled: true
+  single: true
+  type: ClusterIP
+
+securityContext:
+  capabilities:
+    drop: [ALL]
+    add: [NET_BIND_SERVICE]
+  readOnlyRootFilesystem: true
+  runAsGroup: 0
+  runAsNonRoot: false
+  runAsUser: 0
