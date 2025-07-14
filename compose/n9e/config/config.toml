@@ -1,0 +1,107 @@
+[Global]
+RunMode = "release"
+
+[Log]
+Dir = "logs"
+Level = "INFO"
+Output = "stdout"
+
+[HTTP]
+Host = "0.0.0.0"
+Port = 17000
+# whether print access log
+PrintAccessLog = false
+# whether enable pprof
+PProf = false
+# expose prometheus /metrics?
+ExposeMetrics = true
+# http graceful shutdown timeout, unit: s
+ShutdownTimeout = 30
+# max content length: 64M
+MaxContentLength = 67108864
+# http server read timeout, unit: s
+ReadTimeout = 20
+# http server write timeout, unit: s
+WriteTimeout = 40
+# http server idle timeout, unit: s
+IdleTimeout = 120
+
+[HTTP.ShowCaptcha]
+Enable = false 
+
+[HTTP.APIForAgent]
+Enable = true 
+# [HTTP.APIForAgent.BasicAuth]
+# user001 = "ccc26da7b9aba533cbb263a36c07dcc5"
+
+[HTTP.APIForService]
+Enable = false
+[HTTP.APIForService.BasicAuth]
+user001 = "ccc26da7b9aba533cbb263a36c07dcc5"
+
+[HTTP.JWTAuth]
+# unit: min
+AccessExpired = 1500
+# unit: min
+RefreshExpired = 10080
+RedisKeyPrefix = "/jwt/"
+
+[HTTP.TokenAuth]
+Enable = false
+HeaderUserTokenKey = "X-User-Token"
+
+[HTTP.ProxyAuth]
+# if proxy auth enabled, jwt auth is disabled
+Enable = false
+# username key in http proxy header
+HeaderUserNameKey = "X-User-Name"
+DefaultRoles = ["Standard"]
+
+[DB]
+DSN="/app/n9e.db"
+Debug = false
+DBType = "sqlite"
+MaxLifetime = 7200
+MaxOpenConns = 150
+MaxIdleConns = 50
+
+[Redis]
+RedisType = "miniredis"
+
+[Alert]
+[Alert.Heartbeat]
+# auto detect if blank
+IP = ""
+# unit ms
+Interval = 1000
+EngineName = "default"
+
+[Center]
+MetricsYamlFile = "./etc/metrics.yaml"
+I18NHeaderKey = "X-Language"
+
+[Center.AnonymousAccess]
+PromQuerier = false
+AlertDetail = false
+
+[Pushgw]
+LabelRewrite = true
+ForceUseServerTS = true
+
+[[Pushgw.Writers]] 
+Url = "http://vm:8428/api/v1/write"
+Headers = ["X-From", "n9e"]
+Timeout = 10000
+DialTimeout = 3000
+TLSHandshakeTimeout = 30000
+ExpectContinueTimeout = 1000
+IdleConnTimeout = 90000
+# time duration, unit: ms
+KeepAlive = 30000
+MaxConnsPerHost = 0
+MaxIdleConns = 100
+MaxIdleConnsPerHost = 100
+
+[Ibex]
+Enable = true
+RPCListen = "0.0.0.0:20090"
