@@ -1,0 +1,32 @@
+services:
+  traefik:
+    container_name: traefik
+    image: traefik
+    command: --api.insecure=true --providers.docker
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  whoami:
+    container_name: whoami
+    image: traefik/whoami:latest
+    labels:
+      traefik.enable: true
+      traefik.http.routers.whoami.rule: Host(`whoami.example.com`)
+      traefik.http.routers.whoami.middlewares: tinyauth
+
+  tinyauth:
+    container_name: tinyauth
+    image: ghcr.io/steveiliop56/tinyauth
+    environment:
+      # openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32
+      - SECRET=some-random-32-chars-string
+      - APP_URL=https://tinyauth.example.com
+      - USERS=user:$$2a$$10$$UdLYoJ5lgPsC0RKqYH/jMua7zIn0g9kPqWmhYayJYLaZQ/FTmH2/u # user:password
+    ports:
+      - 3000:3000
+    labels:
+      traefik.enable: true
+      traefik.http.routers.tinyauth.rule: Host(`tinyauth.example.com`)
+      traefik.http.middlewares.tinyauth.forwardauth.address: http://tinyauth:3000/api/auth/traefik
